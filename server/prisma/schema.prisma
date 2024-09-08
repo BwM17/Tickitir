@@ -1,0 +1,66 @@
+datasource db {
+    provider = "postgresql" 
+    url = env("DATABASE_URL")
+} 
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+
+enum ROLE {
+    ADMIN
+    MANAGER 
+    USER 
+} 
+
+enum STATUS { 
+    Pending 
+    INPROGRESS
+    DONE
+} 
+
+enum PRIORITY {
+    LOW
+    NORMAL 
+    URGENT
+}
+
+model User {
+    id Int @id @default(autoincrement())  
+    createdAt DateTime @default(now())
+    username String @unique 
+    email String @unique
+    password String 
+    role ROLE @default(USER)
+    tickets Ticket[] 
+    comments Comment[]
+} 
+
+
+model Ticket {
+    id Int @id @default(autoincrement())  
+    createdAt DateTime @default(now()) 
+    title String 
+    description String  
+    priotity PRIORITY @default(LOW)
+    status STATUS @default(Pending)
+
+    user User[]
+    comments Comment[]
+}
+
+
+model Comment {
+    id Int @id @default(autoincrement())  
+    createdAt DateTime @default(now())
+    content String  
+
+    user User? @relation(fields: [userid], references: [id], onDelete: Cascade)  
+    userid Int?   
+    
+    ticket Ticket? @relation(fields: [ticketid], references: [id], onDelete: Cascade)  
+    ticketid Int?
+}
+
+
